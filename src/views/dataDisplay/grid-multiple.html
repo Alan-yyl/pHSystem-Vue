@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+  <meta charset="utf-8">
+</head>
+<body style="height: 100%; margin: 0" onload="initData()">
+<div id="container" style="height: 100%"></div>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+<!--       <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=xfhhaTThl11qYVrqLZii6w8qE5ggnhrY&__ec_v__=20190126"></script>-->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+<script type="text/javascript">
+  var dom = document.getElementById("container");
+  //初始化一个 echarts 实例
+  var myChart = echarts.init(dom);
+  option = null;
+  var pH = [];
+  var temperature = []
+  var timeData = [];
+
+  //把Date对象转为指定的字符串，重写toDateString方法
+  Date.prototype.toDateString = function () {
+    return this.getFullYear() + "/" + (this.getMonth() + 1) + "/" + this.getDate() + "/ " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
+  }
+  //日期格式化方法
+  Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+      "M+": this.getMonth() + 1, //月份
+      "d+": this.getDate(), //日
+      "H+": this.getHours(), //小时
+      "m+": this.getMinutes(), //分
+      "s+": this.getSeconds(), //秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
+
+  //模拟数据,返回10分钟后的数据
+  function randomData(first) {
+    let date = new Date(first);
+    let afterTime = new Date(date.getTime() + 10 * 60 * 1000);
+    let returnTime = afterTime.toDateString();
+    return returnTime;
+  }
+
+  //初始化pH、温度、时间的数据
+  function initData() {
+    //指定日期形如：'2020/3/19 0:00:00'
+    let date = new Date("2020/3/19 0:00:00");
+    //每一分钟显示一次数据，一天存在1440个数据
+    for (let i = 0; i < 24 * 6 * 7; i++) {
+      //生成0-14之间的随机数
+      let phData = (Math.random() * 140 / 10).toFixed(1)
+      pH.push(phData)
+      //生成-50~50摄氏度的随机数
+      let a = [-1, 1];
+      // let temperatureData=a[Math.random()*2]
+      let index = a[Math.floor(Math.random() * 2)];
+      let temperatureData = (Math.random() * 50 * index).toFixed(1);
+      temperature.push(temperatureData);
+      //生成指定日期形如：'2009/6/12 2:00:05'后1444天的数据
+      let afterTime = new Date(date.getTime() + 10 * 60 * 1000)
+      //转换为指定的格式
+      let dateFormat = afterTime.toDateString()
+      timeData.push(new Date(dateFormat).Format("yyyy-MM-dd HH:mm:ss"))
+      date = new Date(dateFormat)
+    }
+    // console.log(pH+"  "+temperature+" "+timeData)
+    console.log(pH)
+    console.log(temperature)
+    console.log(timeData)
+  }
+
+  option = {
+    title: {
+      text: 'pH-温度实时数据',
+      left: 'center'
+    },
+    //提示框组件
+    tooltip: {
+      trigger: 'axis',
+
+      axisPointer: {
+        //是否开启动画
+        animation: false
+      }
+    },
+    //图例组件
+    legend: {
+      data: ['流量', '降雨量'],
+      left: 10
+    },
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: 'none'
+        },
+        restore: {},
+        saveAsImage: {}
+      }
+    },
+    axisPointer: {
+      link: {xAxisIndex: 'all'}
+    },
+    dataZoom: [
+      {
+        show: true,
+        realtime: true,
+        start: 30,
+        end: 70,
+        xAxisIndex: [0, 1]
+      },
+      {
+        type: 'inside',
+        realtime: true,
+        start: 30,
+        end: 70,
+        xAxisIndex: [0, 1]
+      }
+    ],
+    grid: [{
+      left: 50,
+      right: 50,
+      height: '35%'
+    }, {
+      left: 50,
+      right: 50,
+      top: '55%',
+      height: '35%'
+    }],
+    xAxis: [
+      {
+        type: 'category',
+        boundaryGap: false,
+        axisLine: {onZero: true},
+        data: timeData,
+      },
+      {
+        gridIndex: 1,
+        type: 'category',
+        boundaryGap: false,
+        axisLine: {onZero: true},
+        data: timeData,
+        position: 'top'
+      }
+    ],
+    yAxis: [
+      {
+        name: 'pH',
+        type: 'value',
+        max: 14
+      },
+      {
+        gridIndex: 1,
+        name: '温度(℃)',
+        type: 'value',
+        inverse: true,
+        min: -60
+      }
+    ],
+    series: [
+      {
+        name: 'pH值',
+        type: 'line',
+        symbolSize: 8,
+        hoverAnimation: false,
+        data: pH
+      },
+      {
+        name: '温度值',
+        type: 'line',
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        symbolSize: 8,
+        hoverAnimation: false,
+        data: temperature
+      }
+    ]
+  };
+  setInterval(function () {
+
+    // for (var i = 0; i < 5; i++) {
+    //把数组的第一个元素从其中删除
+    pH.shift();
+    pH.push(Math.random() * 400);
+    temperature.shift();
+    temperature.push(Math.random() * 400)
+    let first = timeData.shift();
+    timeData.push(randomData(first))
+    // }
+
+    myChart.setOption({
+      xAxis: [{
+        data: timeData
+      },
+        {
+          data: timeData
+        }
+      ],
+      series: [{
+        data: pH
+      },
+        {
+          data: temperature
+        }
+      ]
+    });
+  }, 2000);
+  ;
+  if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+  }
+</script>
+</body>
+</html>
