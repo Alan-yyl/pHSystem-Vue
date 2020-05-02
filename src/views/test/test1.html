@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script type="text/javascript">
+  //把Date对象转为指定的字符串
+  Date.prototype.toDateString = function () {
+    return this.getFullYear() + "/" + (this.getMonth() + 1) + "/" + this.getDate() + "/ " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
+  }
+
+  Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+      "M+": this.getMonth() + 1, //月份
+      "d+": this.getDate(), //日
+      "H+": this.getHours(), //小时
+      "m+": this.getMinutes(), //分
+      "s+": this.getSeconds(), //秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
+
+  // var unixTimestamp = new Date( 1477386005*1000 ) ;
+  // commonTime = unixTimestamp.toLocaleString();
+  // alert(unixTimestamp);
+  //生成指定日期形如：'2009/6/12 2:00:05'后100天的数据
+  let date = new Date("2009/6/12 3:00");
+  for (let i = 0; i < 100; i++) {
+    //获取1970至今的毫秒数,加5min
+    console.log("毫秒数：" + date.getTime())
+    let afterTime = new Date(date.getTime() + 10 * 60*1000)
+    console.log("after" + afterTime.getTime())
+    //转换为指定的格式
+    let dateFormat = afterTime.toDateString()
+    console.log("指定格式表示：" + dateFormat)
+    console.log(date = new Date(dateFormat).Format("yyyy-MM-dd HH:mm:ss"))
+    date = new Date(dateFormat)
+    console.log("date"+date)
+  }
+  // for (let i = 0; i < 144; i++) {
+    //生成0-14之间的随机数,使用tiFixed保留一位小数
+    // console.log((Math.random()*140/10).toFixed(1))
+    // let a=[-1,1];
+    // 生成-50~50摄氏度的随机数
+    // let index=a[Math.floor(Math.random()*2)];
+    // let temperatureData=Math.random()*50*index;
+    // console.log(temperatureData.toFixed(1))
+    //生成指定日期形如：'2009/6/12 2:00:05'后100天的数据
+  // }
+
+
+
+</script>
+</body>
+
+</html>
