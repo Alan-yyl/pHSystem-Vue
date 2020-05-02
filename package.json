@@ -8,7 +8,11 @@
   },
   "dependencies": {
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "echarts": "latest",
+    "element-ui": "^2.13.1",
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.6",
+    "axios": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
